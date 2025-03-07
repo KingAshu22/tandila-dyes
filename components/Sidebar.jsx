@@ -53,7 +53,7 @@ export function AppSidebar() {
       ? [
         {
           title: "Staffs",
-          url: "/staff",
+          url: "/staffs",
           icon: Box,
         },
       ]

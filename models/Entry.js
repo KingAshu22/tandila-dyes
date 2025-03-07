@@ -8,6 +8,7 @@ const EntriesSchema = new Schema({
     workOrder: [
         {
             orderNo: String,
+            staffCode: String,
             description: String,
             quantity: Number,
             unit: String,

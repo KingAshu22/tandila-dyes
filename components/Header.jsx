@@ -61,7 +61,7 @@ const Header = () => {
                     <Link href="/" className="flex flex-row items-center">
                         <Image
                             src={"/logo.jpg"}
-                            alt="Express Hub"
+                            alt="Goregaon Dyeing"
                             width={200}
                             height={60}
                             className=""

@@ -89,23 +89,23 @@ export const columns = [
     id: "actions",
     header: "Actions",
     cell: ({ row }) => {
-      const { trackingNumber } = row.original;
+      const { batchNo } = row.original;
       return (
         <div className="flex gap-2">
           <Button
             className="bg-green-800"
-            onClick={() => window.open(`/awb/${trackingNumber}`)}
+            onClick={() => window.open(`/entries/${batchNo}`)}
           >
             <Eye className="w-5 h-5" />
           </Button>
           <Button
             className="bg-blue-800"
-            onClick={() => window.open(`/edit-awb/${trackingNumber}`)}
+            onClick={() => window.open(`/edit-entries/${batchNo}`)}
           >
             <Pencil className="w-5 h-5" />
           </Button>
           <Button
-            onClick={() => window.open(`/awb/update-track/${trackingNumber}`)}
+            onClick={() => window.open(`/awb/update-track/${batchNo}`)}
           >
             <LayoutDashboard className="w-5 h-5" />
           </Button>
@@ -117,7 +117,7 @@ export const columns = [
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Deleting AWB with Tracking Number: {trackingNumber} cannot be
+                  Deleting AWB with Tracking Number: {batchNo} cannot be
                   undone.
                 </AlertDialogDescription>
               </AlertDialogHeader>
@@ -125,7 +125,7 @@ export const columns = [
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={() => {
-                    deleteAwb(trackingNumber);
+                    deleteAwb(batchNo);
                   }}
                 >
                   Delete
