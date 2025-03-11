@@ -14,6 +14,7 @@ const EntriesSchema = new Schema({
             unit: String,
             rate: Number,
             amount: Number,
+            inDate: Date,
             outDate: Date,
             remarks: String
         }

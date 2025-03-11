@@ -20,7 +20,7 @@ export default function EntriesForm({ isEdit = false, entry }) {
     const router = useRouter()
     const [success, setSuccess] = useState(false)
     const [date, setDate] = useState(entry?.date || Date.now())
-    const [batchNo, setBatchNo] = useState(entry?.parcelType || "")
+    const [batchNo, setBatchNo] = useState(entry?.batchNo || "")
     const [clients, setClients] = useState([])
     const [staffs, setStaffs] = useState([])
     const [clientName, setClientName] = useState("")
@@ -36,6 +36,7 @@ export default function EntriesForm({ isEdit = false, entry }) {
                 unit: "mtr",
                 rate: 0,
                 amount: 0,
+                inDate: null,
                 outDate: null,
                 remarks: "",
             },
@@ -135,6 +136,7 @@ export default function EntriesForm({ isEdit = false, entry }) {
                 unit: "mtr",
                 rate: 0,
                 amount: 0,
+                inDate: null,
                 outDate: null,
                 remarks: "",
             },
@@ -401,6 +403,22 @@ export default function EntriesForm({ isEdit = false, entry }) {
                                                 value={work.remarks || ""}
                                                 onChange={(e) =>
                                                     handleWorkOrderChange(workIndex, "remarks", e.target.value)}
+                                            />
+                                        </div>
+
+                                        {/* In Date & Time (IST) */}
+                                        <div className="space-y-2">
+                                            <Label htmlFor={`inDate-${workIndex}`}>In Date & Time</Label>
+                                            <Input
+                                                id={`inDate-${workIndex}`}
+                                                type="datetime-local"
+                                                value={work.inDate ? new Date(work.inDate).toISOString().slice(0, 16) : ""}
+                                                onChange={(e) => {
+                                                    const selectedDate = new Date(e.target.value);
+                                                    selectedDate.setHours(selectedDate.getHours() + 5, selectedDate.getMinutes() + 30); // Convert to IST
+                                                    handleWorkOrderChange(workIndex, "inDate", selectedDate);
+                                                }}
+                                                required
                                             />
                                         </div>
                                     </div>
