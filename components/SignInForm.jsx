@@ -35,7 +35,7 @@ const formSchema = z.object({
 });
 
 export default function SignInForm() {
-    const [userType, setUserType] = useState("customer");
+    const [userType, setUserType] = useState("manager");
     const [returnUrl, setReturnUrl] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
@@ -92,7 +92,7 @@ export default function SignInForm() {
             }
         } else {
             try {
-                const response = await fetch("/api/client-signin", {
+                const response = await fetch("/api/manager-signin", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -103,11 +103,11 @@ export default function SignInForm() {
                 const data = await response.json(); // Parse response as JSON
 
                 if (response.ok) {
-                    console.log("Client signed in:", data.client);
+                    console.log("Manager signed in:", data.manager);
                     const authExpiry = Date.now() + 7 * 24 * 60 * 60 * 1000;
-                    localStorage.setItem("id", data.client._id);
-                    localStorage.setItem("userType", "client");
-                    localStorage.setItem("name", data.client.name);
+                    localStorage.setItem("id", data.manager._id);
+                    localStorage.setItem("userType", "manager");
+                    localStorage.setItem("name", data.manager.name);
                     localStorage.setItem("authExpiry", authExpiry);
                     router.push(returnUrl);
                 } else {
@@ -144,7 +144,7 @@ export default function SignInForm() {
             <CardContent>
                 <Tabs value={userType} onValueChange={(value) => setUserType(value)}>
                     <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value="customer">Customer</TabsTrigger>
+                        <TabsTrigger value="customer">Manager</TabsTrigger>
                         <TabsTrigger value="admin">Admin</TabsTrigger>
                     </TabsList>
                 </Tabs>

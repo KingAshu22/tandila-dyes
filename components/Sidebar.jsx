@@ -48,12 +48,17 @@ export function AppSidebar() {
       url: "/clients",
       icon: User,
     },
+    {
+      title: "Staffs",
+      url: "/staffs",
+      icon: Box,
+    },
     // Add Clients menu item conditionally
     ...(userType === "admin"
       ? [
         {
-          title: "Staffs",
-          url: "/staffs",
+          title: "Managers",
+          url: "/managers",
           icon: Box,
         },
       ]

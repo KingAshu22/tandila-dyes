@@ -42,7 +42,7 @@ const Header = () => {
         localStorage.removeItem("name");
         localStorage.removeItem("authExpiry");
         localStorage.removeItem("userType")
-        router.push("/signin")
+        router.push("/login")
     }
 
     const getInitials = (name) => {
