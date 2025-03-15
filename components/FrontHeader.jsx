@@ -44,7 +44,7 @@ export default function FrontHeader() {
                         <Link href="#contact">
                             <Button>Contact Us</Button>
                         </Link>
-                        <Link href="/login">
+                        <Link href="/dashboard">
                             <Button>Login</Button>
                         </Link>
                     </nav>
@@ -90,7 +90,7 @@ export default function FrontHeader() {
                         <Link href="#contact" onClick={() => setMobileMenuOpen(false)}>
                             <Button className="w-full">Contact Us</Button>
                         </Link>
-                        <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                        <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
                             <Button className="w-full">Login</Button>
                         </Link>
                     </div>

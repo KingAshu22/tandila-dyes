@@ -62,7 +62,6 @@ const EntriesTable = ({ entry }) => {
                             <th className="p-2 text-left">Staff Code</th>
                             <th className="p-2 text-left">Description</th>
                             <th className="p-2 text-left">Quantity</th>
-                            <th className="p-2 text-left">Unit</th>
                             <th className="p-2 text-left">Rate</th>
                             <th className="p-2 text-left">Amount</th>
                             <th className="p-2 text-left">Out Date</th>
@@ -85,12 +84,20 @@ const EntriesTable = ({ entry }) => {
                                 </td>
                                 <td className="p-2">{order.staffCode}</td>
                                 <td className="p-2">{order.description}</td>
-                                <td className="p-2">{order.quantity}</td>
-                                <td className="p-2">{order.unit}</td>
+                                <td className="p-2">{order.quantity} {order.unit}</td>
                                 <td className="p-2">{order.rate}</td>
                                 <td className="p-2">{order.amount}</td>
                                 <td className="p-2">
-                                    {order.outDate ? new Date(order.outDate).toLocaleDateString("en-IN") : "-"}
+                                    {order.outDate
+                                        ? new Date(new Date(order.outDate).getTime() - 5.5 * 60 * 60 * 1000).toLocaleString("en-IN", {
+                                            day: "2-digit",
+                                            month: "long",
+                                            year: "numeric",
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                            hour12: false,
+                                        })
+                                        : "-"}
                                 </td>
                                 <td className="p-2">{order.remarks}</td>
                             </tr>

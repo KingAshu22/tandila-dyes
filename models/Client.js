@@ -6,6 +6,10 @@ const ClientSchema = new Schema({
     contact: String,
     code: String,
     password: String,
+    services: {
+        type: String,
+        rate: Number,
+    }
 });
 
 const Client = models.Client || model("Client", ClientSchema);

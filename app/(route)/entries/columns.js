@@ -33,7 +33,7 @@ const ShowName = ({ id }) => {
         const response = await axios.get(`/api/clients/${id}`);
         const data = response.data;
         if (data) {
-          setName(data.name);
+          setName(data[0].name);
         } else {
           setName("Unknown Client");
         }
@@ -195,7 +195,7 @@ export const columns = [
     cell: ({ row }) => {
       const { clientCode } = row.original;
       return (
-        <span>{ShowName(clientCode)}</span>
+        <span>{clientCode} <ShowName id={clientCode} /></span>
       );
     },
   },
