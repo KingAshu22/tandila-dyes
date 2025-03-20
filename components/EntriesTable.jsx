@@ -1,10 +1,23 @@
 import React from "react";
 import { Phone, MapPin, Globe } from "lucide-react";
+import numberToWords from "number-to-words";
 
 const EntriesTable = ({ entry }) => {
     if (!entry) {
         return <div className="text-center text-gray-500">No entry found</div>;
     }
+
+    // Calculate total quantity and total amount
+    const totalQuantity = entry.workOrder.reduce((sum, order) => sum + order.quantity, 0);
+    const totalAmount = entry.workOrder.reduce((sum, order) => sum + Number(order.amount), 0);
+
+    // Format total amount with Indian comma separator
+    const formattedTotalAmount = totalAmount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    const amountInWords = numberToWords.toWords(totalAmount)
+        .replace(/\b\w/g, char => char.toUpperCase()) // Capitalize first letter of each word
+        .replace(/,/g, ""); // Remove unwanted commas
+
 
     return (
         <div className="max-w-5xl mx-auto p-6 bg-white shadow-md rounded-lg mt-6">
@@ -102,8 +115,22 @@ const EntriesTable = ({ entry }) => {
                                 <td className="p-2">{order.remarks}</td>
                             </tr>
                         ))}
+                        {/* Total Row */}
+                        <tr className="bg-gray-200 font-semibold">
+                            <td className="p-2 text-right" colSpan="4">Total:</td>
+                            <td className="p-2">{totalQuantity}</td>
+                            <td className="p-2"></td>
+                            <td className="p-2">₹{formattedTotalAmount}/-</td>
+                            <td className="p-2"></td>
+                            <td className="p-2"></td>
+                        </tr>
                     </tbody>
                 </table>
+            </div>
+
+            {/* Amount in Words */}
+            <div className="mt-4 text-gray-700 font-semibold">
+                Amount in Words: {amountInWords} Rupees Only
             </div>
 
             {/* Print Button */}

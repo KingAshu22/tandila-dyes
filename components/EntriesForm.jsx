@@ -32,6 +32,7 @@ export default function EntriesForm({ isEdit = false, entry }) {
                 orderNo: "",
                 staffCode: "",
                 description: "",
+                service: "Dyeing",
                 quantity: "",
                 unit: "mtr",
                 rate: 0,
@@ -54,7 +55,7 @@ export default function EntriesForm({ isEdit = false, entry }) {
             const client = clients.find((c) => c.name === clientName)
             setClientCode(client?.code)
         }
-    }, [clientName, clients])
+    }, [clientName, clients]);
 
     const fetchClients = async () => {
         try {
@@ -132,6 +133,7 @@ export default function EntriesForm({ isEdit = false, entry }) {
                 orderNo: newWorkOrder,
                 staffCode: "",
                 description: "",
+                service: "Dyeing",
                 quantity: "",
                 unit: "mtr",
                 rate: 0,
@@ -148,6 +150,40 @@ export default function EntriesForm({ isEdit = false, entry }) {
         handleWorkOrderChange(workIndex, "staffName", selectedStaffName)
         handleWorkOrderChange(workIndex, "staffCode", staff?.code || "")
     }
+
+    const handleServiceChange = async (workIndex, service) => {
+        handleWorkOrderChange(workIndex, "service", service);
+
+        if (!clientName) return;
+
+        const client = clients.find((c) => c.name === clientName);
+        if (!client) return;
+
+        try {
+            const response = await axios.get(`/api/clients/${client.code}`);
+            const clientData = response.data;
+
+            // Check if response is an array and extract the first item if necessary
+            const clientObj = Array.isArray(clientData) ? clientData[0] : clientData;
+
+            console.log("Client data:", clientObj);
+            console.log("Service Selected:", service);
+
+            // Trim whitespace and ensure correct case for comparison
+            const selectedService = service.trim();
+
+            // Find the matching service in the services array
+            const serviceRate = clientObj.services?.find(
+                (s) => s.type.trim().toLowerCase() === selectedService.toLowerCase()
+            )?.rate;
+
+            console.log("Service rate:", serviceRate);
+
+            handleWorkOrderChange(workIndex, "rate", serviceRate);
+        } catch (error) {
+            console.error("Error fetching service rate:", error);
+        }
+    };
 
     const handleWorkOrderChange = (index, field, value) => {
         const updatedWorkOrders = [...workOrder]
@@ -309,7 +345,7 @@ export default function EntriesForm({ isEdit = false, entry }) {
                                     )}
                                 </CardHeader>
                                 <CardContent className="space-y-6">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                                         <div className="space-y-2">
                                             <Label htmlFor={`description-${workIndex}`}>Description</Label>
                                             <Input
@@ -320,6 +356,19 @@ export default function EntriesForm({ isEdit = false, entry }) {
                                                 onChange={(e) => handleWorkOrderChange(workIndex, "description", e.target.value || "")}
                                                 required
                                             />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor={`service-${workIndex}`}>Select Service</Label>
+                                            <Select value={work.service} onValueChange={(value) => handleServiceChange(workIndex, value)}>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select Service" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="Dyeing">Dyeing</SelectItem>
+                                                    <SelectItem value="Redyeing">Redyeing</SelectItem>
+                                                    <SelectItem value="Hydro Dyeing">Hydro Dyeing</SelectItem>
+                                                </SelectContent>
+                                            </Select>
                                         </div>
                                         <div className="space-y-2">
                                             <Label htmlFor={`quantity-${workIndex}`}>Quantity</Label>

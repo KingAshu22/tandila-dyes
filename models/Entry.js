@@ -10,6 +10,7 @@ const EntriesSchema = new Schema({
             orderNo: String,
             staffCode: String,
             description: String,
+            service: String,
             quantity: Number,
             unit: String,
             rate: Number,
