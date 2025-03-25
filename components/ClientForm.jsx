@@ -31,7 +31,7 @@ const formSchema = z.object({
 export default function ClientRegisterForm({ isEdit = false, client }) {
     const [isLoading, setIsLoading] = useState(false)
     const [showPassword, setShowPassword] = useState(false)
-    const servicesOptions = ["Dyeing", "Redyeing", "Hydro Dyeing"]
+    const servicesOptions = ["Dyeing", "Redyeing", "Hydro Dyeing", "Fusing"]
     const addOnsOptions = ["Roll Press"]
 
     // Initialize selectedServices and selectedAddOns with client data if available

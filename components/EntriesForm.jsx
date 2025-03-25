@@ -32,7 +32,7 @@ export default function EntriesForm({ isEdit = false, entry }) {
                 orderNo: "",
                 staffCode: "",
                 description: "",
-                service: "Dyeing",
+                service: "",
                 quantity: "",
                 unit: "mtr",
                 rate: 0,
@@ -133,7 +133,7 @@ export default function EntriesForm({ isEdit = false, entry }) {
                 orderNo: newWorkOrder,
                 staffCode: "",
                 description: "",
-                service: "Dyeing",
+                service: "",
                 quantity: "",
                 unit: "mtr",
                 rate: 0,
@@ -367,6 +367,7 @@ export default function EntriesForm({ isEdit = false, entry }) {
                                                     <SelectItem value="Dyeing">Dyeing</SelectItem>
                                                     <SelectItem value="Redyeing">Redyeing</SelectItem>
                                                     <SelectItem value="Hydro Dyeing">Hydro Dyeing</SelectItem>
+                                                    <SelectItem value="Fusing">Fusing</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>
