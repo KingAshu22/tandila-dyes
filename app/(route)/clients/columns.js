@@ -84,19 +84,19 @@ export const columns = [
       return (
         <div className="flex gap-2">
           {/* Edit Button */}
-          <Button
-            className="px-2 py-1 bg-blue-800"
-            onClick={() => router.push(`/clients/edit/${code}`)}
+          <a
+            className="px-2 py-1 bg-blue-800 text-white rounded-sm"
+            href={`/clients/edit/${code}`}
           >
             <Pencil className="w-[20px] h-[20px]" />
-          </Button>
+          </a>
 
-          <Button
-            className="px-2 py-1 bg-red-600"
-            onClick={() => router.push(`/clients/entries/${code}`)}
+          <a
+            className="px-2 py-1 bg-red-600 text-white rounded-sm"
+            href={`/clients/entries/${code}`}
           >
             <Eye className="w-[20px] h-[20px]" />
-          </Button>
+          </a>
 
           {/* Delete Confirmation Dialog */}
           <AlertDialog>
