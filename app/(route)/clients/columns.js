@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { ArrowUpDown, Eye, Pencil, Trash } from "lucide-react";
 import axios from "axios";
-import { useRouter } from "next/navigation";
 
 const deleteClient = async (code) => {
   try {
@@ -79,7 +78,6 @@ export const columns = [
     header: "Actions",
     cell: ({ row }) => {
       const { code, name } = row.original;
-      const router = useRouter();
 
       return (
         <div className="flex gap-2">
