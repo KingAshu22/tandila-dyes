@@ -8,6 +8,12 @@ import numberToWords from "number-to-words"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 
+import { format } from "date-fns"
+import { CalendarIcon } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Calendar } from "@/components/ui/calendar"
+
 const ClientEntries = ({ params }) => {
     const { code } = use(params)
 
@@ -16,6 +22,10 @@ const ClientEntries = ({ params }) => {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
     const [sortedWorkOrders, setSortedWorkOrders] = useState([])
+
+    const [fromDate, setFromDate] = useState(null)
+    const [toDate, setToDate] = useState(null)
+    const [filteredWorkOrders, setFilteredWorkOrders] = useState([])
 
     useEffect(() => {
         const fetchData = async () => {
@@ -54,6 +64,20 @@ const ClientEntries = ({ params }) => {
         }
     }, [entries])
 
+    useEffect(() => {
+        if (sortedWorkOrders.length > 0) {
+            if (fromDate && toDate) {
+                const filtered = sortedWorkOrders.filter((order) => {
+                    const orderDate = new Date(order.inDate)
+                    return orderDate >= fromDate && orderDate <= toDate
+                })
+                setFilteredWorkOrders(filtered)
+            } else {
+                setFilteredWorkOrders(sortedWorkOrders)
+            }
+        }
+    }, [sortedWorkOrders, fromDate, toDate])
+
     const handlePrint = () => {
         window.print()
     }
@@ -73,7 +97,7 @@ const ClientEntries = ({ params }) => {
     if (loading) return <div className="flex justify-center items-center min-h-screen">Loading...</div>
     if (error) return <div className="flex justify-center items-center min-h-screen text-destructive">{error}</div>
 
-    const totalAmount = sortedWorkOrders.reduce((sum, order) => sum + order.amount, 0)
+    const totalAmount = filteredWorkOrders.reduce((sum, order) => sum + order.amount, 0)
 
     const amountInWords = numberToWords
         .toWords(totalAmount)
@@ -83,7 +107,41 @@ const ClientEntries = ({ params }) => {
     return (
         <div className="min-h-screen bg-background p-4 md:p-8 print:p-0 print:bg-white">
             {/* Print Button - Hidden when printing */}
-            <div className="print:hidden flex justify-end mb-4">
+            <div className="print:hidden flex justify-end mb-4 gap-2 items-center flex-wrap">
+                <div className="flex items-center gap-2">
+                    <div className="grid gap-2">
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant={"outline"}
+                                    className={cn("w-[180px] justify-start text-left font-normal", !fromDate && "text-muted-foreground")}
+                                >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {fromDate ? format(fromDate, "PPP") : <span>From Date</span>}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0">
+                                <Calendar mode="single" selected={fromDate} onSelect={setFromDate} initialFocus />
+                            </PopoverContent>
+                        </Popover>
+                    </div>
+                    <div className="grid gap-2">
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant={"outline"}
+                                    className={cn("w-[180px] justify-start text-left font-normal", !toDate && "text-muted-foreground")}
+                                >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {toDate ? format(toDate, "PPP") : <span>To Date</span>}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0">
+                                <Calendar mode="single" selected={toDate} onSelect={setToDate} initialFocus />
+                            </PopoverContent>
+                        </Popover>
+                    </div>
+                </div>
                 <Button onClick={handlePrint} className="gap-2">
                     <Printer className="h-4 w-4" />
                     Print Invoice
@@ -93,16 +151,15 @@ const ClientEntries = ({ params }) => {
             <Card className="w-full max-w-[250mm] mx-auto shadow-md print:shadow-none print:max-w-none">
                 <CardContent className="p-6 print:p-4">
                     {/* Header */}
-                    <div className="border-b pb-4 mb-6 text-center">
+                    <div className="border-b pb-4 mb-4 text-center -mt-8">
                         <h1 className="text-2xl md:text-3xl font-bold text-primary">Goregaon Dyeing</h1>
-                        <div className="flex flex-col md:flex-row justify-center gap-2 md:gap-6 text-muted-foreground text-sm mt-2">
+                        <div className="items-center justify-center text-[14px]">
+                            <span>237/1890, Motilal Nagar No 1, Road No 4, Near Ganesh Mandir, Goregaon West, Mumbai 400 104</span>
+                        </div>
+                        <div className="flex flex-row justify-center gap-2 md:gap-6 text-muted-foreground text-sm mt-2 text-[14px]">
                             <div className="flex items-center justify-center gap-2">
                                 <Phone className="w-4 h-4 text-primary" />
-                                <span>+91 91361 99100</span>
-                            </div>
-                            <div className="flex items-center justify-center gap-2">
-                                <MapPin className="w-4 h-4 text-primary" />
-                                <span>Goregaon West, Mumbai 400 065</span>
+                                <span>+91 91361 99100 / +91 92247 26007</span>
                             </div>
                             <div className="flex items-center justify-center gap-2">
                                 <Globe className="w-4 h-4 text-primary" />
@@ -129,44 +186,48 @@ const ClientEntries = ({ params }) => {
 
                     {/* Table for larger screens */}
                     <div className="w-full overflow-x-auto hidden md:block print:block">
-                        <table className="w-full border-collapse">
+                        <table className="w-full border-collapse border-rounded">
                             <thead>
-                                <tr className="bg-muted text-left">
-                                    <th className="border p-2 text-center">In Date</th>
-                                    <th className="border p-2 text-center">Batch No</th>
-                                    <th className="border p-2 text-center">VR No</th>
-                                    <th className="border p-2 text-center">Out Date</th>
-                                    <th className="border p-2 text-center">Description</th>
-                                    <th className="border p-2 text-center">Service</th>
-                                    <th className="border p-2 text-center text-xs">Quantity</th>
-                                    <th className="border p-2 text-center text-xs">Rate</th>
-                                    <th className="border p-2 text-center text-xs">Amount</th>
+                                <tr className="bg-muted text-left text-[10px]">
+                                    <th className="border px-1 text-center w-20">In Date</th>
+                                    <th className="border px-1 text-center w-20">Batch No</th>
+                                    <th className="border px-1 text-center w-20">Challan No</th>
+                                    <th className="border px-1 text-center w-20">Out Date</th>
+                                    <th className="border px-1 text-center w-32">Description</th>
+                                    <th className="border px-1 text-center w-8">Service</th>
+                                    <th className="border px-1 text-center w-8">Quantity</th>
+                                    <th className="border px-1 text-center w-8">Rate</th>
+                                    <th className="border px-1 text-center w-8">Amount</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {sortedWorkOrders.map((order) => (
-                                    <tr key={order._id} className="border hover:bg-muted/50 print:hover:bg-transparent text-xs">
-                                        <td className="border py-2 px-1">{formatDate(order.inDate)}</td>
-                                        <td className="border py-2 px-1 whitespace-nowrap">{order.batchNo}</td>
-                                        <td className="border py-2 px-1 whitespace-nowrap">{order.vrNo}</td>
-                                        <td className="border py-2 px-1">{formatDate(order.outDate)}</td>
-                                        <td className="border py-2 px-1">{order.description}</td>
-                                        <td className="border py-2 px-1">{order.service || "-"}</td>
-                                        <td className="border py-2 px-1">
+                                {filteredWorkOrders.map((order) => (
+                                    <tr key={order._id} className="border hover:bg-muted/50 print:hover:bg-transparent text-[8px]">
+                                        <td className="border p-0">{formatDate(order.inDate)}</td>
+                                        <td className="border p-0 whitespace-nowrap">{order.batchNo}</td>
+                                        <td className="border p-0 whitespace-nowrap">{order.vrNo}</td>
+                                        <td className="border p-0">{formatDate(order.outDate)}</td>
+                                        <td className="border p-0">{order.description}</td>
+                                        <td className="border p-0">{order.service || "-"}</td>
+                                        <td className="border p-0">
                                             {order.quantity} {order.unit}
                                         </td>
-                                        <td className="border p-2 text-right">₹{order.rate}</td>
-                                        <td className="border p-2 text-right">
+                                        <td className="border p-0 text-right">₹{order.rate}</td>
+                                        <td className="border p-0 text-right">
                                             ₹{order.amount.toLocaleString("en-IN", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
                                         </td>
                                     </tr>
                                 ))}
-                                <tr className="bg-muted font-bold">
-                                    <td className="border p-2">Total</td>
-                                    <td className="border p-2 text-left" colSpan={7}>
+                            </tbody>
+                        </table>
+                        <table className="w-full border-collapse">
+                            <tbody>
+                                <tr className="bg-muted font-bold text-[10px]">
+                                    <td className="border px-1">Total</td>
+                                    <td className="border px-1 text-left" colSpan={7}>
                                         {amountInWords} Rupees Only
                                     </td>
-                                    <td className="border p-2 text-right">
+                                    <td className="border px-1 text-right">
                                         ₹{totalAmount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                     </td>
                                 </tr>
@@ -176,7 +237,7 @@ const ClientEntries = ({ params }) => {
 
                     {/* Mobile view - Cards instead of table */}
                     <div className="md:hidden print:hidden space-y-4">
-                        {sortedWorkOrders.map((order) => (
+                        {filteredWorkOrders.map((order) => (
                             <Card key={order._id} className="overflow-hidden">
                                 <CardContent className="p-4 grid grid-cols-2 gap-2 text-xs">
                                     <div className="col-span-2 bg-muted -m-4 mb-2 p-2 flex justify-between">
@@ -224,11 +285,6 @@ const ClientEntries = ({ params }) => {
                                 </div>
                             </CardContent>
                         </Card>
-                    </div>
-
-                    {/* Footer - only visible when printing */}
-                    <div className="hidden print:block mt-8 text-center text-sm text-muted-foreground border-t pt-4">
-                        <p>Thank you for your business!</p>
                     </div>
                 </CardContent>
             </Card>
