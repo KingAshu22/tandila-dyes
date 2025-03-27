@@ -53,4 +53,4 @@ function InvoiceTable() {
   );
 }
 
-export default withAuth(ClientTable);
+export default withAuth(InvoiceTable);
