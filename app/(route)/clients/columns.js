@@ -18,6 +18,49 @@ import axios from "axios";
 import Account, { getAccount } from "@/lib/getAccount";
 import { useEffect, useState } from "react";
 
+const DebitCell = ({ code }) => {
+  const [debit, setDebit] = useState(null);
+
+  useEffect(() => {
+    async function fetchDebit() {
+      const account = await getAccount(code);
+      setDebit(account.totalDebit);
+    }
+    fetchDebit();
+  }, [code]);
+
+  return <span>{debit !== null ? debit.toLocaleString("en-IN") : "Loading..."}</span>;
+};
+
+const CreditCell = ({ code }) => {
+  const [credit, setCredit] = useState(null);
+
+  useEffect(() => {
+    async function fetchCredit() {
+      const account = await getAccount(code);
+      setCredit(account.totalCredit);
+    }
+    fetchCredit();
+  }, [code]);
+
+  return <span>{credit !== null ? credit.toLocaleString("en-IN") : "Loading..."}</span>;
+};
+
+const BalanceCell = ({ code }) => {
+  const [balance, setBalance] = useState(null);
+
+  useEffect(() => {
+    async function fetchBalance() {
+      const account = await getAccount(code);
+      setBalance(account.finalBalance);
+    }
+    fetchBalance();
+  }, [code]);
+
+  return <span>{balance !== null ? balance.toLocaleString("en-IN") : "Loading..."}</span>;
+};
+
+
 const deleteClient = async (code) => {
   try {
     await axios.delete(`/api/clients/${code}`, { withCredentials: true });
@@ -54,56 +97,17 @@ export const columns = [
   {
     id: "debit",
     header: "Debit",
-    cell: ({ row }) => {
-      const { code } = row.original;
-      const [debit, setDebit] = useState(null);
-
-      useEffect(() => {
-        async function fetchDebit() {
-          const account = await getAccount(code);
-          setDebit(account.totalDebit);
-        }
-        fetchDebit();
-      }, [code]);
-
-      return debit !== null ? debit.toLocaleString("en-IN") : "Loading...";
-    },
+    cell: ({ row }) => <DebitCell code={row.original.code} />,
   },
   {
     id: "credit",
     header: "Credit",
-    cell: ({ row }) => {
-      const { code } = row.original;
-      const [credit, setCredit] = useState(null);
-
-      useEffect(() => {
-        async function fetchCredit() {
-          const account = await getAccount(code);
-          setCredit(account.totalCredit);
-        }
-        fetchCredit();
-      }, [code]);
-
-      return credit !== null ? credit.toLocaleString("en-IN") : "Loading...";
-    },
+    cell: ({ row }) => <CreditCell code={row.original.code} />,
   },
   {
     id: "balance",
     header: "Balance",
-    cell: ({ row }) => {
-      const { code } = row.original;
-      const [balance, setBalance] = useState(null);
-
-      useEffect(() => {
-        async function fetchBalance() {
-          const account = await getAccount(code);
-          setBalance(account.finalBalance);
-        }
-        fetchBalance();
-      }, [code]);
-
-      return balance !== null ? balance.toLocaleString("en-IN") : "Loading...";
-    },
+    cell: ({ row }) => <BalanceCell code={row.original.code} />,
   },
   {
     accessorKey: "contact",
