@@ -184,4 +184,4 @@ function ClientBalanceSheet() {
     )
 }
 
-export default withAuth(ClientBalanceSheet)
+export default (ClientBalanceSheet)
