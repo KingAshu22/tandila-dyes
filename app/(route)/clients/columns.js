@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { ArrowUpDown, Eye, Pencil, Trash } from "lucide-react";
 import axios from "axios";
+import Account, { getAccount } from "@/lib/getAccount";
+import { useEffect, useState } from "react";
 
 const deleteClient = async (code) => {
   try {
@@ -48,6 +50,60 @@ export const columns = [
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </span>
     ),
+  },
+  {
+    id: "debit",
+    header: "Debit",
+    cell: ({ row }) => {
+      const { code } = row.original;
+      const [debit, setDebit] = useState(null);
+
+      useEffect(() => {
+        async function fetchDebit() {
+          const account = await getAccount(code);
+          setDebit(account.totalDebit);
+        }
+        fetchDebit();
+      }, [code]);
+
+      return debit !== null ? debit.toLocaleString("en-IN") : "Loading...";
+    },
+  },
+  {
+    id: "credit",
+    header: "Credit",
+    cell: ({ row }) => {
+      const { code } = row.original;
+      const [credit, setCredit] = useState(null);
+
+      useEffect(() => {
+        async function fetchCredit() {
+          const account = await getAccount(code);
+          setCredit(account.totalCredit);
+        }
+        fetchCredit();
+      }, [code]);
+
+      return credit !== null ? credit.toLocaleString("en-IN") : "Loading...";
+    },
+  },
+  {
+    id: "balance",
+    header: "Balance",
+    cell: ({ row }) => {
+      const { code } = row.original;
+      const [balance, setBalance] = useState(null);
+
+      useEffect(() => {
+        async function fetchBalance() {
+          const account = await getAccount(code);
+          setBalance(account.finalBalance);
+        }
+        fetchBalance();
+      }, [code]);
+
+      return balance !== null ? balance.toLocaleString("en-IN") : "Loading...";
+    },
   },
   {
     accessorKey: "contact",
