@@ -1,12 +1,10 @@
 import {
-  Calendar,
   LayoutDashboard,
   User,
-  Search,
-  Settings,
-  Sun,
   Box,
   Files,
+  Sun,
+  IndianRupee
 } from "lucide-react";
 
 import {
@@ -52,6 +50,11 @@ export function AppSidebar() {
       title: "Staffs",
       url: "/staffs",
       icon: Box,
+    },
+    {
+      title: "Invoice",
+      url: "/invoice",
+      icon: IndianRupee,
     },
     // Add Clients menu item conditionally
     ...(userType === "admin"

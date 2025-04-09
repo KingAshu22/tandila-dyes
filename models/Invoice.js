@@ -5,7 +5,14 @@ const InvoicesSchema = new Schema({
     clientCode: String,
     invoiceNo: String,
     fromDate: Date,
-    toDate: Date
+    toDate: Date,
+    paymentReceived: [{
+        date: String,
+        amount: Number,
+        mode: String,
+        receivedTo: String,
+    }],
+    balanceAmount: String,
 });
 
 const Invoice = models.Invoice || model("Invoice", InvoicesSchema);

@@ -7,28 +7,26 @@ import { HashLoader } from "react-spinners";
 import withAuth from "@/lib/withAuth";
 
 function InvoiceTable() {
-  const [clients, setClients] = useState([]);
+  const [invoice, setInvoice] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchClients();
+    fetchInvoice();
   }, []);
 
-  const fetchClients = async () => {
+  const fetchInvoice = async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get("/api/clients");
+      const response = await axios.get("/api/invoice");
       console.log(response.data);
-      setClients(response.data);
+      setInvoice(response.data);
     } catch (error) {
-      console.error("Error fetching clients:", error);
-      setError("Failed to fetch clients. Please try again later.");
+      console.error("Error fetching invoice:", error);
+      setError("Failed to fetch invoice. Please try again later.");
     } finally {
-      setTimeout(() => {
-        setLoading(false);
-      }, 1000);
+      setLoading(false);
     }
   };
 
@@ -48,7 +46,7 @@ function InvoiceTable() {
 
   return (
     <div className="container w-full px-4">
-      <DataTable columns={columns} data={clients} />
+      <DataTable columns={columns} data={invoice} />
     </div>
   );
 }

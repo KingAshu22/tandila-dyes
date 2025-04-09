@@ -60,15 +60,15 @@ export function DataTable({ columns, data }) {
     <div className="w-full">
       <div className="flex items-center flex-wrap gap-2 py-1">
         <Input
-          placeholder="Filter by Name..."
-          value={table.getColumn("name")?.getFilterValue() ?? ""}
+          placeholder="Filter by Batch No..."
+          value={table.getColumn("batchNo")?.getFilterValue() ?? ""}
           onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
+            table.getColumn("batchNo")?.setFilterValue(event.target.value)
           }
           className="max-w-40"
         />
-        <Button onClick={() => router.push("/clients/create")}>
-          Create New Client
+        <Button onClick={() => router.push("/rollpress/create")}>
+          New Roll Press Entry
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

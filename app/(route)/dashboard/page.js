@@ -187,70 +187,109 @@ function Dashboard() {
 
   // Service distribution chart data
   const serviceDistributionData = () => {
+    if (!filteredEntries || filteredEntries.length === 0) {
+      return [{ name: "No Data", value: 1 }]
+    }
+
     const serviceMap = new Map()
 
     filteredEntries.forEach((entry) => {
-      entry.workOrder.forEach((order) => {
-        const service = order.service
-        const quantity = order.quantity
+      if (entry.workOrder && Array.isArray(entry.workOrder)) {
+        entry.workOrder.forEach((order) => {
+          if (order && order.service) {
+            const service = order.service
+            const quantity = order.quantity || 0
 
-        if (serviceMap.has(service)) {
-          serviceMap.set(service, serviceMap.get(service) + quantity)
-        } else {
-          serviceMap.set(service, quantity)
-        }
-      })
+            if (serviceMap.has(service)) {
+              serviceMap.set(service, serviceMap.get(service) + quantity)
+            } else {
+              serviceMap.set(service, quantity)
+            }
+          }
+        })
+      }
     })
+
+    // If no services were found, return a placeholder
+    if (serviceMap.size === 0) {
+      return [{ name: "No Data", value: 1 }]
+    }
 
     return Array.from(serviceMap, ([name, value]) => ({ name, value }))
   }
 
   // Client distribution chart data
   const clientDistributionData = () => {
+    if (!filteredEntries || filteredEntries.length === 0) {
+      return [{ name: "No Data", value: 1 }]
+    }
+
     const clientMap = new Map()
 
     filteredEntries.forEach((entry) => {
-      const clientCode = entry.clientCode
-      const clientName = getClientName(clientCode)
-      const revenue = entry.workOrder.reduce((sum, order) => sum + order.amount, 0)
+      if (entry && entry.clientCode) {
+        const clientCode = entry.clientCode
+        const clientName = getClientName(clientCode)
 
-      if (clientMap.has(clientName)) {
-        clientMap.set(clientName, clientMap.get(clientName) + revenue)
-      } else {
-        clientMap.set(clientName, revenue)
+        let revenue = 0
+        if (entry.workOrder && Array.isArray(entry.workOrder)) {
+          revenue = entry.workOrder.reduce((sum, order) => sum + (order.amount || 0), 0)
+        }
+
+        if (clientMap.has(clientName)) {
+          clientMap.set(clientName, clientMap.get(clientName) + revenue)
+        } else {
+          clientMap.set(clientName, revenue)
+        }
       }
     })
+
+    // If no clients were found, return a placeholder
+    if (clientMap.size === 0) {
+      return [{ name: "No Data", value: 1 }]
+    }
 
     return Array.from(clientMap, ([name, value]) => ({ name, value }))
   }
 
   // Processing time analysis
   const processingTimeData = () => {
+    if (!filteredEntries || filteredEntries.length === 0) {
+      return [{ service: "No Data", avgDays: 0 }]
+    }
+
     const serviceTimeMap = new Map()
 
     filteredEntries.forEach((entry) => {
-      entry.workOrder.forEach((order) => {
-        if (order.inDate && order.outDate) {
-          const service = order.service
-          const inDate = new Date(order.inDate)
-          const outDate = new Date(order.outDate)
-          const processingDays = Math.ceil((outDate - inDate) / (1000 * 60 * 60 * 24))
+      if (entry.workOrder && Array.isArray(entry.workOrder)) {
+        entry.workOrder.forEach((order) => {
+          if (order && order.service && order.inDate && order.outDate) {
+            const service = order.service
+            const inDate = new Date(order.inDate)
+            const outDate = new Date(order.outDate)
+            const processingDays = Math.ceil((outDate - inDate) / (1000 * 60 * 60 * 24))
 
-          if (serviceTimeMap.has(service)) {
-            const current = serviceTimeMap.get(service)
-            serviceTimeMap.set(service, {
-              totalDays: current.totalDays + processingDays,
-              count: current.count + 1,
-            })
-          } else {
-            serviceTimeMap.set(service, {
-              totalDays: processingDays,
-              count: 1,
-            })
+            if (serviceTimeMap.has(service)) {
+              const current = serviceTimeMap.get(service)
+              serviceTimeMap.set(service, {
+                totalDays: current.totalDays + processingDays,
+                count: current.count + 1,
+              })
+            } else {
+              serviceTimeMap.set(service, {
+                totalDays: processingDays,
+                count: 1,
+              })
+            }
           }
-        }
-      })
+        })
+      }
     })
+
+    // If no processing times were found, return a placeholder
+    if (serviceTimeMap.size === 0) {
+      return [{ service: "No Data", avgDays: 0 }]
+    }
 
     return Array.from(serviceTimeMap, ([service, data]) => ({
       service,
@@ -260,27 +299,44 @@ function Dashboard() {
 
   // Monthly trend data
   const monthlyTrendData = () => {
+    if (!filteredEntries || filteredEntries.length === 0) {
+      return [{ month: "No Data", revenue: 0, quantity: 0 }]
+    }
+
     const monthMap = new Map()
 
     filteredEntries.forEach((entry) => {
-      const date = new Date(entry.date)
-      const monthKey = date.toLocaleDateString("en-US", { month: "short", year: "numeric" })
-      const revenue = entry.workOrder.reduce((sum, order) => sum + order.amount, 0)
-      const quantity = entry.workOrder.reduce((sum, order) => sum + order.quantity, 0)
+      if (entry && entry.date) {
+        const date = new Date(entry.date)
+        const monthKey = date.toLocaleDateString("en-US", { month: "short", year: "numeric" })
 
-      if (monthMap.has(monthKey)) {
-        const current = monthMap.get(monthKey)
-        monthMap.set(monthKey, {
-          revenue: current.revenue + revenue,
-          quantity: current.quantity + quantity,
-        })
-      } else {
-        monthMap.set(monthKey, {
-          revenue,
-          quantity,
-        })
+        let revenue = 0
+        let quantity = 0
+
+        if (entry.workOrder && Array.isArray(entry.workOrder)) {
+          revenue = entry.workOrder.reduce((sum, order) => sum + (order.amount || 0), 0)
+          quantity = entry.workOrder.reduce((sum, order) => sum + (order.quantity || 0), 0)
+        }
+
+        if (monthMap.has(monthKey)) {
+          const current = monthMap.get(monthKey)
+          monthMap.set(monthKey, {
+            revenue: current.revenue + revenue,
+            quantity: current.quantity + quantity,
+          })
+        } else {
+          monthMap.set(monthKey, {
+            revenue,
+            quantity,
+          })
+        }
       }
     })
+
+    // If no monthly data was found, return a placeholder
+    if (monthMap.size === 0) {
+      return [{ month: "No Data", revenue: 0, quantity: 0 }]
+    }
 
     return Array.from(monthMap, ([month, data]) => ({
       month,
@@ -328,6 +384,13 @@ function Dashboard() {
   if (error) {
     return <div className="container mx-auto py-10 text-red-500">{error}</div>
   }
+
+  // Prepare chart data in advance to avoid multiple calculations
+  const serviceData = serviceDistributionData()
+  const clientData = clientDistributionData()
+  const processingData = processingTimeData()
+  const monthlyData = monthlyTrendData()
+  const revenueData = revenueByDateData()
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -461,7 +524,7 @@ function Dashboard() {
                     >
                       <AreaChart
                         accessibilityLayer
-                        data={revenueByDateData()}
+                        data={revenueData}
                         margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
                       >
                         <CartesianGrid strokeDasharray="3 3" />
@@ -505,7 +568,7 @@ function Dashboard() {
                     >
                       <BarChart
                         accessibilityLayer
-                        data={monthlyTrendData()}
+                        data={monthlyData}
                         margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
                       >
                         <CartesianGrid strokeDasharray="3 3" />
@@ -533,16 +596,18 @@ function Dashboard() {
                     <ChartContainer>
                       <RechartsPieChart>
                         <Pie
-                          data={serviceDistributionData()}
+                          data={serviceData}
                           cx="50%"
                           cy="50%"
                           labelLine={false}
                           outerRadius={80}
                           fill="#8884d8"
                           dataKey="value"
-                          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                          label={({ name, percent }) =>
+                            name === "No Data" ? "No Data" : `${name}: ${(percent * 100).toFixed(0)}%`
+                          }
                         >
-                          {serviceDistributionData().map((entry, index) => (
+                          {serviceData.map((entry, index) => (
                             <Cell key={`service-cell-${index}`} fill={COLORS[index % COLORS.length]} />
                           ))}
                         </Pie>
@@ -561,7 +626,7 @@ function Dashboard() {
                     <ChartContainer>
                       <BarChart
                         accessibilityLayer
-                        data={serviceDistributionData()}
+                        data={serviceData}
                         layout="vertical"
                         margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                       >
@@ -570,7 +635,7 @@ function Dashboard() {
                         <YAxis type="category" dataKey="name" width={100} />
                         <ChartTooltip content={<ChartTooltipContent />} />
                         <Bar dataKey="value" fill="#E31E24">
-                          {serviceDistributionData().map((entry, index) => (
+                          {serviceData.map((entry, index) => (
                             <Cell key={`service-bar-cell-${index}`} fill={COLORS[index % COLORS.length]} />
                           ))}
                         </Bar>
@@ -592,16 +657,18 @@ function Dashboard() {
                     <ChartContainer>
                       <RechartsPieChart>
                         <Pie
-                          data={clientDistributionData()}
+                          data={clientData}
                           cx="50%"
                           cy="50%"
                           labelLine={false}
                           outerRadius={80}
                           fill="#8884d8"
                           dataKey="value"
-                          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                          label={({ name, percent }) =>
+                            name === "No Data" ? "No Data" : `${name}: ${(percent * 100).toFixed(0)}%`
+                          }
                         >
-                          {clientDistributionData().map((entry, index) => (
+                          {clientData.map((entry, index) => (
                             <Cell key={`client-cell-${index}`} fill={COLORS[index % COLORS.length]} />
                           ))}
                         </Pie>
@@ -620,7 +687,7 @@ function Dashboard() {
                     <ChartContainer>
                       <BarChart
                         accessibilityLayer
-                        data={clientDistributionData()}
+                        data={clientData}
                         layout="vertical"
                         margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                       >
@@ -629,7 +696,7 @@ function Dashboard() {
                         <YAxis type="category" dataKey="name" width={100} />
                         <ChartTooltip content={<ChartTooltipContent />} />
                         <Bar dataKey="value" fill="#0088FE">
-                          {clientDistributionData().map((entry, index) => (
+                          {clientData.map((entry, index) => (
                             <Cell key={`client-bar-cell-${index}`} fill={COLORS[index % COLORS.length]} />
                           ))}
                         </Bar>
@@ -658,7 +725,7 @@ function Dashboard() {
                     >
                       <BarChart
                         accessibilityLayer
-                        data={processingTimeData()}
+                        data={processingData}
                         margin={{ top: 10, right: 30, left: 20, bottom: 5 }}
                       >
                         <CartesianGrid strokeDasharray="3 3" />
@@ -666,7 +733,7 @@ function Dashboard() {
                         <YAxis />
                         <ChartTooltip content={<ChartTooltipContent />} />
                         <Bar dataKey="avgDays" fill="#00C49F">
-                          {processingTimeData().map((entry, index) => (
+                          {processingData.map((entry, index) => (
                             <Cell key={`processing-cell-${index}`} fill={COLORS[index % COLORS.length]} />
                           ))}
                         </Bar>
@@ -690,7 +757,7 @@ function Dashboard() {
                     >
                       <LineChart
                         accessibilityLayer
-                        data={processingTimeData()}
+                        data={processingData}
                         margin={{ top: 10, right: 30, left: 20, bottom: 5 }}
                       >
                         <CartesianGrid strokeDasharray="3 3" />
@@ -732,8 +799,8 @@ function Dashboard() {
                         data={filteredEntries.slice(0, 10).map((entry) => ({
                           batchNo: entry.batchNo,
                           client: getClientName(entry.clientCode),
-                          quantity: entry.workOrder.reduce((sum, order) => sum + order.quantity, 0),
-                          amount: entry.workOrder.reduce((sum, order) => sum + order.amount, 0),
+                          quantity: entry.workOrder.reduce((sum, order) => sum + (order.quantity || 0), 0),
+                          amount: entry.workOrder.reduce((sum, order) => sum + (order.amount || 0), 0),
                         }))}
                         margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                       >
